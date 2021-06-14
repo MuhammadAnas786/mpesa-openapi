@@ -10,7 +10,7 @@ export class Pesa {
         this.BASE_DOMAIN = 'https://openapi.m-pesa.com/';
         this.AUTH_URL = 'ipg/v2/vodafoneGHA/getSession/';
         this.TRANSACTION_ROUTES = {
-             b2c: 'ipg/v2/vodafoneGHA/b2cPayment/singleStage/',
+             b2c: 'ipg/v2/vodafoneGHA/b2cPayment/',
              c2b: 'ipg/v2/vodafoneGHA/c2bPayment/singleStage/',
              ddc: 'ipg/v2/vodafoneGHA/directDebitCreation/',
              ddp: 'ipg/v2/vodafoneGHA/directDebitPayment/',
@@ -130,7 +130,7 @@ export class Pesa {
         }
         const response = await axios({
             method: 'post',
-            url: this.baseURL + this.TRANSACTION_ROUTES.c2b,
+            url: this.baseURL + this.TRANSACTION_ROUTES.b2c,
             headers: {
                 Accept: 'application/json',
                 Origin: '*',
@@ -144,7 +144,7 @@ export class Pesa {
                 input_ServiceProviderCode: data.input_ServiceProviderCode,
                 input_ThirdPartyConversationID: data.input_ThirdPartyConversationID,
                 input_TransactionReference: data.input_TransactionReference,
-                input_PurchasedItemsDesc: data.input_PurchasedItemsDesc,
+                input_PaymentItemsDesc: data.input_PaymentItemsDesc,
             },
         });
         return response.data;
@@ -203,63 +203,77 @@ export class Pesa {
         return response.data;
     }
    
-   async debit_create(data, sessionID) {
-        let output_SessionID = '';
-        if (sessionID == null) {
-            const res = await this.get_session();
-            output_SessionID = res.output_SessionID;
-        }
+    // debit_create(data: ddc, sessionID: string | null): Promise<Res> {
+    //     let output_SessionID = '';
+    //     if (sessionID == null) {
+    //         const res = await this.get_session();
+    //         output_SessionID = res.output_SessionID;
+    //     }
 
-        const response = await axios({
-            method: 'post',
-            url: this.baseURL + this.TRANSACTION_ROUTES.ddc,
-            headers: {
-                Accept: 'application/json',
-                Origin: '*',
-                Authorization: 'Bearer ' + this.encrypt_key(output_SessionID),
-            },
-            data: {
-                input_AgreedTC: data.input_AgreedTC,
-                input_Country: data.input_Country,
-                input_CustomerMSISDN: data.input_CustomerMSISDN,
-                input_EndRangeOfDays: data.input_EndRangeOfDays,
-                input_ExpiryDate: data.input_ExpiryDate,
-                input_FirstPaymentDate: data.input_FirstPaymentDate,
-                input_Frequency: data.input_Frequency,
-                input_ServiceProviderCode: data.input_ServiceProviderCode,
-                input_StartRangeOfDays: data.input_StartRangeOfDays,
-                input_ThirdPartyConversationID: data.input_ThirdPartyConversationID,
-                input_ThirdPartyReference: data.input_ThirdPartyReference,
-            },
-        });
-        return response.data;
-    }
-   
-    async debit_payment(data, sessionID) {
-        let output_SessionID = '';
-        if (sessionID == null) {
-            const res = await this.get_session();
-            output_SessionID = res.output_SessionID;
-        }
+    //     const response = await axios({
+    //         method: 'post',
+    //         url: this.baseURL + this.TRANSACTION_ROUTES.ddc,
+    //         headers: {
+    //             Accept: 'application/json',
+    //             Origin: '*',
+    //             Authorization: 'Bearer ' + this.encrypt_key(output_SessionID),
+    //         },
+    //         data: {
+    //             input_AgreedTC: data.input_AgreedTC,
+    //             input_Country: data.input_Country,
+    //             input_CustomerMSISDN: data.input_CustomerMSISDN,
+    //             input_EndRangeOfDays: data.input_EndRangeOfDays,
+    //             input_ExpiryDate: data.input_ExpiryDate,
+    //             input_FirstPaymentDate: data.input_FirstPaymentDate,
+    //             input_Frequency: data.input_Frequency,
+    //             input_ServiceProviderCode: data.input_ServiceProviderCode,
+    //             input_StartRangeOfDays: data.input_StartRangeOfDays,
+    //             input_ThirdPartyConversationID: data.input_ThirdPartyConversationID,
+    //             input_ThirdPartyReference: data.input_ThirdPartyReference,
+    //         },
+    //     });
+    //     return response.data;
+    // }
+    // /**
+    //  * Direct Debit Payment
+    //  *
+    //  * Direct Debits are payments in M-Pesa that are initiated by the Payee alone without any Payer interaction, but permission must first be granted by the Payer. The granted permission from the Payer to Payee is commonly termed a ‘Mandate’, and M-Pesa must hold details of this Mandate.
+    //  * The Direct Debit API set allows an organisation to get the initial consent of their customers to create the Mandate that allows the organisation to debit customer's account at an agreed frequency and amount for services rendered. After the initial consent, the debit of the account will not involve any customer interaction. The Direct Debit feature makes use of the following API calls:
+    //  * •    Create a Direct Debit mandate
+    //  * •    Pay a mandate
+    //  * The customer is able to view and cancel the Direct Debit mandate from G2 menu accessible via USSD menu or the Smartphone Application.
+    //  *
+    //  * @api
 
-        const response = await axios({
-            method: 'post',
-            url: this.baseURL + this.TRANSACTION_ROUTES.ddp,
-            headers: {
-                Accept: 'application/json',
-                Origin: '*',
-                Authorization: 'Bearer ' + this.encrypt_key(output_SessionID),
-            },
-            data: {
-                input_Amount: data.input_Amount,
-                input_Country: data.input_Country,
-                input_Currency: data.input_Currency,
-                input_CustomerMSISDN: data.input_CustomerMSISDN,
-                input_ServiceProviderCode: data.input_ServiceProviderCode,
-                input_ThirdPartyConversationID: data.input_ThirdPartyConversationID,
-                input_ThirdPartyReference: data.input_ThirdPartyReference,
-            },
-        });
-        return response.data;
-    }
+    //  * @param data
+
+    //  * @returns {Promise} Promise
+    //  */
+    // public async debit_payment(data: ddp, sessionID: string | null): Promise<Res> {
+    //     let output_SessionID = '';
+    //     if (sessionID == null) {
+    //         const res = await this.get_session();
+    //         output_SessionID = res.output_SessionID;
+    //     }
+
+    //     const response = await axios({
+    //         method: 'post',
+    //         url: this.baseURL + this.TRANSACTION_ROUTES.ddp,
+    //         headers: {
+    //             Accept: 'application/json',
+    //             Origin: '*',
+    //             Authorization: 'Bearer ' + this.encrypt_key(output_SessionID),
+    //         },
+    //         data: {
+    //             input_Amount: data.input_Amount,
+    //             input_Country: data.input_Country,
+    //             input_Currency: data.input_Currency,
+    //             input_CustomerMSISDN: data.input_CustomerMSISDN,
+    //             input_ServiceProviderCode: data.input_ServiceProviderCode,
+    //             input_ThirdPartyConversationID: data.input_ThirdPartyConversationID,
+    //             input_ThirdPartyReference: data.input_ThirdPartyReference,
+    //         },
+    //     });
+    //     return response.data;
+    // }
 }
